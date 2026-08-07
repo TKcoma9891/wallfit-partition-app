@@ -4,11 +4,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#071A2B" />
+  <meta name="application-name" content="WALLFIT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="WALLFIT" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>WALLFIT — パーテーション自動拾い出し</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="48x48" href="./favicon-48.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles-20260806.css" />
 </head>
 <body>
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
@@ -56,8 +65,27 @@
           <label class="number-field"><span>CH <small>mm</small></span><input id="ch" inputmode="numeric" type="number" min="1" value="2700"><i id="chCheck">手入力</i></label>
         </div>
 
-        <details class="advanced"><summary>詳細条件 <span>END・控除設定</span></summary><div class="advanced-grid">
-          <label>END幅<input id="endWidth" type="number" value="40"><small>mm</small></label><label>入り込み<input id="insertion" type="number" value="20"><small>mm</small></label><label>最小パネル幅<input id="minPanel" type="number" value="500"><small>mm</small></label><label>ドア控除<input id="doorDeduction" type="number" value="0"><small>mm</small></label>
+        <section class="door-input" aria-labelledby="doorTitle">
+          <div class="door-head"><div><span class="kicker">DOOR VARIATION</span><h3 id="doorTitle">ドア選択</h3></div><span class="provisional-badge">仮マスタ・要確認</span></div>
+          <div class="door-deduction-row">
+            <span>ドア開口を総幅から控除</span>
+            <div class="compact-segmented">
+              <input checked id="doorNo" name="doorDeduct" type="radio" value="いいえ"><label for="doorNo">いいえ</label>
+              <input id="doorYes" name="doorDeduct" type="radio" value="はい"><label for="doorYes">はい</label>
+            </div>
+          </div>
+          <div class="door-table" role="group" aria-label="ドアバリエーション入力">
+            <div class="door-table-head"><span>ドア形式</span><span>数量</span><span>開口幅</span><span>開口高</span></div>
+            <div class="door-row"><b>片開きドア</b><label><input id="singleDoorQty" type="number" min="0" step="1" value="0"><small>枚</small></label><label><input id="singleDoorWidth" type="number" min="1" value="900"><small>mm</small></label><label><input id="singleDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
+            <div class="door-row"><b>親子ドア</b><label><input id="parentChildDoorQty" type="number" min="0" step="1" value="0"><small>組</small></label><label><input id="parentChildDoorWidth" type="number" min="1" value="1200"><small>mm</small></label><label><input id="parentChildDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
+            <div class="door-row"><b>両開きドア</b><label><input id="doubleDoorQty" type="number" min="0" step="1" value="0"><small>組</small></label><label><input id="doubleDoorWidth" type="number" min="1" value="1800"><small>mm</small></label><label><input id="doubleDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
+          </div>
+          <div class="door-summary"><span>ドア開口幅合計</span><strong id="doorOpeningTotal">0</strong><small>mm</small><i id="doorDeductionStatus">割付から控除しない</i></div>
+          <p class="door-note">開口幅・開口高はExcel「仕様・接続・ドア入力」の初期値です。ドア詳細部材は正式部材表が未登録のため、一式の仮マスタとして表示します。</p>
+        </section>
+
+        <details class="advanced"><summary>詳細条件 <span>END・パネル設定</span></summary><div class="advanced-grid">
+          <label>END幅<input id="endWidth" type="number" value="40"><small>mm</small></label><label>入り込み<input id="insertion" type="number" value="20"><small>mm</small></label><label>最小パネル幅<input id="minPanel" type="number" value="500"><small>mm</small></label><label>パネル高さ控除<input id="panelHeightDeduction" type="number" value="0"><small>mm</small></label>
         </div></details>
         <button id="calculateBtn" class="primary-button"><span>拾い出しを実行</span><b>→</b></button>
       </article>
@@ -76,6 +104,6 @@
   <div id="toast" class="toast" role="status"></div>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-  <script src="./app.js"></script>
+  <script src="./app-20260806.js"></script>
 </body>
 </html>
