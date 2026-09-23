@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles-20260806.css" />
+  <link rel="stylesheet" href="./styles-20260924.css" />
 </head>
 <body>
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
@@ -75,13 +75,13 @@
             </div>
           </div>
           <div class="door-table" role="group" aria-label="ドアバリエーション入力">
-            <div class="door-table-head"><span>ドア形式</span><span>数量</span><span>開口幅</span><span>開口高</span></div>
-            <div class="door-row"><b>片開きドア</b><label><input id="singleDoorQty" type="number" min="0" step="1" value="0"><small>枚</small></label><label><input id="singleDoorWidth" type="number" min="1" value="900"><small>mm</small></label><label><input id="singleDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
-            <div class="door-row"><b>親子ドア</b><label><input id="parentChildDoorQty" type="number" min="0" step="1" value="0"><small>組</small></label><label><input id="parentChildDoorWidth" type="number" min="1" value="1200"><small>mm</small></label><label><input id="parentChildDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
-            <div class="door-row"><b>両開きドア</b><label><input id="doubleDoorQty" type="number" min="0" step="1" value="0"><small>組</small></label><label><input id="doubleDoorWidth" type="number" min="1" value="1800"><small>mm</small></label><label><input id="doubleDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
+            <div class="door-table-head"><span>ドア形式</span><span class="hand-head">勝手・数量</span><span>開口幅</span><span>開口高</span></div>
+            <div class="door-row"><b>片開きドア</b><div class="hand-qty" aria-label="片開きドアの勝手別数量"><label><em>L</em><input id="singleDoorLQty" type="number" min="0" step="1" value="0"><small>枚</small></label><label><em>R</em><input id="singleDoorRQty" type="number" min="0" step="1" value="0"><small>枚</small></label></div><label><input id="singleDoorWidth" type="number" min="1" value="900"><small>mm</small></label><label><input id="singleDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
+            <div class="door-row"><b>親子ドア</b><div class="hand-qty" aria-label="親子ドアの勝手別数量"><label><em>L</em><input id="parentChildDoorLQty" type="number" min="0" step="1" value="0"><small>組</small></label><label><em>R</em><input id="parentChildDoorRQty" type="number" min="0" step="1" value="0"><small>組</small></label></div><label><input id="parentChildDoorWidth" type="number" min="1" value="1200"><small>mm</small></label><label><input id="parentChildDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
+            <div class="door-row"><b>両開きドア</b><div class="hand-qty" aria-label="両開きドアの勝手別数量"><label><em>L</em><input id="doubleDoorLQty" type="number" min="0" step="1" value="0"><small>組</small></label><label><em>R</em><input id="doubleDoorRQty" type="number" min="0" step="1" value="0"><small>組</small></label></div><label><input id="doubleDoorWidth" type="number" min="1" value="1800"><small>mm</small></label><label><input id="doubleDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
           </div>
           <div class="door-summary"><span>ドア開口幅合計</span><strong id="doorOpeningTotal">0</strong><small>mm</small><i id="doorDeductionStatus">割付から控除しない</i></div>
-          <p class="door-note">開口幅・開口高はExcel「仕様・接続・ドア入力」の初期値です。ドア詳細部材は正式部材表が未登録のため、一式の仮マスタとして表示します。</p>
+          <p class="door-note">開口幅・開口高はExcel「仕様・接続・ドア入力」の初期値です。勝手は平面図で一般的なL／R表記です。ドア詳細部材は正式部材表が未登録のため、一式の仮マスタとして表示します。</p>
         </section>
 
         <details class="advanced"><summary>詳細条件 <span>END・パネル設定</span></summary><div class="advanced-grid">
@@ -94,7 +94,7 @@
     <section id="resultSection" class="result-section hidden" aria-live="polite">
       <div class="result-heading"><div><span class="kicker">TAKEOFF RESULT</span><h2>拾い出し結果</h2></div><div class="result-actions"><button id="copyBtn" class="secondary-button">結果をコピー</button><button id="exportBtn" class="primary-small">Excel出力 ↓</button></div></div>
       <div class="result-grid">
-        <article class="result-card summary-card"><div class="card-title"><h3>割付サマリー</h3><span id="statusPill">CHECKED</span></div><div class="metric"><span>割付対象幅</span><strong id="allocationWidth">—</strong><small>mm</small></div><div id="partitionBar" class="partition-bar"></div><div id="partitionLegend" class="legend"></div></article>
+        <article class="result-card summary-card"><div class="card-title"><h3>割付サマリー</h3><span id="statusPill">CHECKED</span></div><div class="metric"><span>割付対象幅</span><strong id="allocationWidth">—</strong><small>mm</small></div><div id="partitionBar" class="partition-bar"></div><div id="partitionLegend" class="legend"></div><div id="doorSymbols" class="door-symbols" aria-label="ドア勝手記号"></div></article>
         <article class="result-card parts-card"><div class="card-title"><h3>部材数量</h3><span id="productName"></span></div><div id="partsGrid" class="parts-grid"></div></article>
         <article class="result-card formula-card"><div class="card-title"><h3>計算根拠</h3><button id="formulaToggle">詳細</button></div><p id="formulaLabel"></p><code id="formulaExpression"></code><div id="deductionGrid" class="deduction-grid"></div></article>
       </div>
@@ -104,6 +104,6 @@
   <div id="toast" class="toast" role="status"></div>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-  <script src="./app-20260806.js"></script>
+  <script src="./app-20260924.js"></script>
 </body>
 </html>

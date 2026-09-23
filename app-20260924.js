@@ -24,10 +24,15 @@ function selected(name) { const node = document.querySelector(`input[name="${nam
 function setSelected(name, value) { const node = document.querySelector(`input[name="${name}"][value="${value}"]`); if (node) node.checked = true; }
 function num(id) { return +$(id).value; }
 function doorInputs() {
+  const makeDoor=(key,lQty,rQty,width,height)=>({
+    key,label:DOOR_MASTER[key].label,l_qty:num(lQty),r_qty:num(rQty),
+    qty:num(lQty)+num(rQty),width:num(width),height:num(height),unit:DOOR_MASTER[key].unit,
+    master_status:DOOR_MASTER[key].master_status
+  });
   return [
-    { key:'single', label:DOOR_MASTER.single.label, qty:num('#singleDoorQty'), width:num('#singleDoorWidth'), height:num('#singleDoorHeight'), unit:DOOR_MASTER.single.unit, master_status:DOOR_MASTER.single.master_status },
-    { key:'parent_child', label:DOOR_MASTER.parent_child.label, qty:num('#parentChildDoorQty'), width:num('#parentChildDoorWidth'), height:num('#parentChildDoorHeight'), unit:DOOR_MASTER.parent_child.unit, master_status:DOOR_MASTER.parent_child.master_status },
-    { key:'double', label:DOOR_MASTER.double.label, qty:num('#doubleDoorQty'), width:num('#doubleDoorWidth'), height:num('#doubleDoorHeight'), unit:DOOR_MASTER.double.unit, master_status:DOOR_MASTER.double.master_status },
+    makeDoor('single','#singleDoorLQty','#singleDoorRQty','#singleDoorWidth','#singleDoorHeight'),
+    makeDoor('parent_child','#parentChildDoorLQty','#parentChildDoorRQty','#parentChildDoorWidth','#parentChildDoorHeight'),
+    makeDoor('double','#doubleDoorLQty','#doubleDoorRQty','#doubleDoorWidth','#doubleDoorHeight'),
   ];
 }
 function payload() {
@@ -54,7 +59,8 @@ function calculate(req) {
   if (req.min_panel_width < 1 || req.min_panel_width > 899) throw new Error('最小パネル幅は1～899mmで設定してください');
   if (!Number.isFinite(req.panel_height_deduction) || req.panel_height_deduction < 0 || req.panel_height_deduction >= req.ch) throw new Error('パネル高さ控除を確認してください');
   req.doors.forEach(d => {
-    validateIntegerNonnegative(d.qty, d.label);
+    validateIntegerNonnegative(d.l_qty, `${d.label} L`);
+    validateIntegerNonnegative(d.r_qty, `${d.label} R`);
     if (d.qty > 0 && (!Number.isFinite(d.width) || d.width < 1)) throw new Error(`${d.label}の開口幅を入力してください`);
     if (d.qty > 0 && (!Number.isFinite(d.height) || d.height < 1)) throw new Error(`${d.label}の開口高を入力してください`);
   });
@@ -109,7 +115,7 @@ function updateDoorSummary() {
   $('#doorDeductionStatus').textContent=deduct?`${total.toLocaleString()}mmを割付から控除`:'割付から控除しない';
   $('#doorDeductionStatus').style.color=deduct?'#b06d00':'#087f6b';
 }
-['#singleDoorQty','#singleDoorWidth','#singleDoorHeight','#parentChildDoorQty','#parentChildDoorWidth','#parentChildDoorHeight','#doubleDoorQty','#doubleDoorWidth','#doubleDoorHeight'].forEach(id=>$(id).addEventListener('input',updateDoorSummary));
+['#singleDoorLQty','#singleDoorRQty','#singleDoorWidth','#singleDoorHeight','#parentChildDoorLQty','#parentChildDoorRQty','#parentChildDoorWidth','#parentChildDoorHeight','#doubleDoorLQty','#doubleDoorRQty','#doubleDoorWidth','#doubleDoorHeight'].forEach(id=>$(id).addEventListener('input',updateDoorSummary));
 $$('input[name="doorDeduct"]').forEach(n=>n.addEventListener('change',updateDoorSummary));
 
 function normalizeOcr(text){return text.replace(/[，]/g,',').replace(/[：]/g,':').replace(/[Ｏ〇]/g,'0').replace(/[Ｉｌ]/g,'1');}
@@ -130,14 +136,28 @@ async function analyzeFile(file){
 els.file.addEventListener('change',e=>analyzeFile(e.target.files[0]));['dragenter','dragover'].forEach(ev=>els.drop.addEventListener(ev,e=>{e.preventDefault();els.drop.classList.add('drag')}));['dragleave','drop'].forEach(ev=>els.drop.addEventListener(ev,e=>{e.preventDefault();els.drop.classList.remove('drag')}));els.drop.addEventListener('drop',e=>analyzeFile(e.dataTransfer.files[0]));
 $('#resetBtn').addEventListener('click',()=>{els.file.value='';els.empty.classList.remove('hidden');els.preview.classList.add('hidden');els.result.classList.add('hidden');els.badge.textContent='OCR未解析';els.badge.classList.add('muted');els.note.className='notice';els.note.innerHTML='<b>図面を追加してください</b><span>読取後も、必ず図面と照合してから計算してください。</span>'});
 
+function doorSvg(hand,kind){
+  const mirror=hand==='R'?'translate(60 0) scale(-1 1)':'';
+  if(kind==='double')return `<svg viewBox="0 0 60 42" role="img" aria-label="両開き ${hand}"><g transform="${mirror}"><path class="door-wall" d="M2 40h56"/><path class="door-leaf" d="M10 40V8M10 40L30 12M50 40L30 12"/><path class="door-arc" d="M10 8A32 32 0 0 1 42 40M50 8A32 32 0 0 0 18 40"/></g></svg>`;
+  if(kind==='parent_child')return `<svg viewBox="0 0 60 42" role="img" aria-label="親子 ${hand}"><g transform="${mirror}"><path class="door-wall" d="M2 40h56"/><path class="door-leaf" d="M10 40V8M10 40L42 20M50 40V24M50 40L42 34"/><path class="door-arc" d="M10 8A32 32 0 0 1 42 40"/></g></svg>`;
+  return `<svg viewBox="0 0 60 42" role="img" aria-label="片開き ${hand}"><g transform="${mirror}"><path class="door-wall" d="M2 40h56"/><path class="door-leaf" d="M10 40V8M10 40L42 20"/><path class="door-arc" d="M10 8A32 32 0 0 1 42 40"/></g></svg>`;
+}
+function renderDoorSymbols(doors){
+  const active=doors.flatMap(d=>[['L',d.l_qty],['R',d.r_qty]].filter(x=>x[1]>0).map(([hand,qty])=>({d,hand,qty})));
+  $('#doorSymbols').innerHTML=active.length?active.map(({d,hand,qty})=>`<div class="door-symbol-card">${doorSvg(hand,d.key)}<div><b>${d.label} ${hand}</b><span>${qty}${d.unit}・W${d.width}×H${d.height}</span></div></div>`).join(''):'<span class="door-card-empty">ドア選択時に、平面図形式のL／R記号を表示します。</span>';
+}
+
 function render(result){
   lastResult=result;$('#allocationWidth').textContent=result.dimensions.allocation_width.toLocaleString();$('#productName').textContent=`${result.product} / ${result.product_name}`;$('#statusPill').textContent=result.status==='OK'?'CHECKED':'REVIEW';
   const bar=$('#partitionBar');bar.innerHTML='';result.pieces.forEach(p=>{const d=document.createElement('div');d.className=`partition-piece p${p.type}`;d.style.flex=`${p.width} 1 0`;d.textContent=p.type==='adjustment'?`調整 ${p.width}`:p.width;bar.appendChild(d)});
   $('#partitionLegend').innerHTML='<span><i style="background:#cce7ef"></i>W1200</span><span><i style="background:#bde6dc"></i>W900</span><span><i style="background:#ffe2a9"></i>調整</span>';
   const baseItems=[['W1200',result.counts.panel_1200,'枚',''],['W900',result.counts.panel_900,'枚',''],['調整',result.counts.adjustment,result.dimensions.adjustment_width?`${result.dimensions.adjustment_width}mm`:'不要',''],['END',result.counts.end,'本',''],['2WAY',result.counts.two_way,'個',''],['3WAY',result.counts.three_way,'個','']];
-  const doorItems=result.doors.map(d=>[d.label,d.qty,d.unit,'door-part']);
+  const doorItems=result.doors.flatMap(d=>[
+    [`${d.label} L`,d.l_qty,d.unit,'door-part'],[`${d.label} R`,d.r_qty,d.unit,'door-part']
+  ]);
   const items=[...baseItems,...doorItems];
-  $('#partsGrid').innerHTML=items.map(x=>`<div class="part ${x[3]}"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></div>`).join('')+'<div class="door-result-note">ドアはExcelと同じ一式の仮マスタです。正式なドア枠・丁番・戸当り・ハンドル等の構成は、正式部材表の反映後に確定してください。</div>';
+  $('#partsGrid').innerHTML=items.map(x=>`<div class="part ${x[3]}"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></div>`).join('')+'<div class="door-result-note">L／Rは平面図上の開き勝手です。両開きは主扉（先開き側）の吊元で表記します。ドア詳細部材は仮マスタです。</div>';
+  renderDoorSymbols(result.doors);
   $('#formulaLabel').textContent=result.formula.label;$('#formulaExpression').textContent=`${result.formula.expression} ＝ ${result.formula.result.toLocaleString()}mm`;
   $('#deductionGrid').innerHTML=[['END控除',result.dimensions.end_deduction],['接続控除',result.dimensions.connection_deduction],['ドア控除',result.dimensions.door_deduction]].map(x=>`<div><span>${x[0]}</span><b>${x[1].toLocaleString()}mm</b></div>`).join('');
   els.result.classList.remove('hidden');$$('.step').forEach(x=>x.classList.toggle('active',x.dataset.step==='3'));els.result.scrollIntoView({behavior:'smooth',block:'start'});
@@ -147,13 +167,15 @@ els.calculate.addEventListener('click',()=>{els.calculate.disabled=true;els.calc
 async function exportExcel(){
   if(!lastResult)lastResult=calculate(payload());if(!window.ExcelJS)throw new Error('Excel出力機能を読み込めませんでした');const r=lastResult,wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('拾い出し結果',{views:[{showGridLines:false}]});ws.columns=[{width:3},{width:24},{width:22},{width:22},{width:24},{width:3}];
   ws.mergeCells('B2:E3');const title=ws.getCell('B2');title.value='パーテーション 拾い出し結果';title.font={name:'Arial',size:20,bold:true,color:{argb:'FFFFFFFF'}};title.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF163A5F'}};title.alignment={horizontal:'center',vertical:'middle'};
-  const rows=[['製品',`${r.product}（${r.product_name}）`],['形状',r.shape],['総幅',r.dimensions.total_width],['割付対象幅',r.dimensions.allocation_width],['CH',r.input.ch],['END',r.counts.end],['2WAY',r.counts.two_way],['3WAY',r.counts.three_way],['W1200',r.counts.panel_1200],['W900',r.counts.panel_900],['調整パネル',r.counts.adjustment],['調整幅',r.dimensions.adjustment_width],['片開きドア 数量',r.doors[0].qty],['片開きドア 開口幅',r.doors[0].width],['片開きドア 開口高',r.doors[0].height],['親子ドア 数量',r.doors[1].qty],['親子ドア 開口幅',r.doors[1].width],['親子ドア 開口高',r.doors[1].height],['両開きドア 数量',r.doors[2].qty],['両開きドア 開口幅',r.doors[2].width],['両開きドア 開口高',r.doors[2].height],['ドア開口幅合計',r.dimensions.door_opening_total],['割付からのドア控除',r.dimensions.door_deduction]];
+  const rows=[['製品',`${r.product}（${r.product_name}）`],['形状',r.shape],['総幅',r.dimensions.total_width],['割付対象幅',r.dimensions.allocation_width],['CH',r.input.ch],['END',r.counts.end],['2WAY',r.counts.two_way],['3WAY',r.counts.three_way],['W1200',r.counts.panel_1200],['W900',r.counts.panel_900],['調整パネル',r.counts.adjustment],['調整幅',r.dimensions.adjustment_width],
+    ...r.doors.flatMap(d=>[[`${d.label} L 数量`,d.l_qty],[`${d.label} R 数量`,d.r_qty],[`${d.label} 開口幅`,d.width],[`${d.label} 開口高`,d.height]]),
+    ['ドア開口幅合計',r.dimensions.door_opening_total],['割付からのドア控除',r.dimensions.door_deduction]];
   rows.forEach((row,i)=>{const rr=5+i;ws.getCell(`B${rr}`).value=row[0];ws.getCell(`C${rr}`).value=row[1];['B','C'].forEach(c=>{ws.getCell(`${c}${rr}`).border={top:{style:'thin',color:{argb:'FFB7C9D6'}},left:{style:'thin',color:{argb:'FFB7C9D6'}},bottom:{style:'thin',color:{argb:'FFB7C9D6'}},right:{style:'thin',color:{argb:'FFB7C9D6'}}}});ws.getCell(`B${rr}`).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFD9EAF7'}};ws.getCell(`B${rr}`).font={bold:true};ws.getCell(`C${rr}`).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE2F0D9'}};ws.getCell(`C${rr}`).font={bold:true}});
   const calcRow=rows.length+6;ws.mergeCells(`B${calcRow}:E${calcRow}`);ws.getCell(`B${calcRow}`).value='計算根拠';ws.getCell(`B${calcRow}`).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}};ws.getCell(`B${calcRow}`).font={bold:true,color:{argb:'FFFFFFFF'}};ws.getCell(`B${calcRow}`).alignment={horizontal:'center'};ws.mergeCells(`B${calcRow+1}:E${calcRow+3}`);ws.getCell(`B${calcRow+1}`).value=`${r.formula.label}\n${r.formula.expression} ＝ ${r.formula.result.toLocaleString()}mm\n※ドア詳細部材は仮マスタ・要確認`;ws.getCell(`B${calcRow+1}`).alignment={wrapText:true,vertical:'middle',horizontal:'center'};ws.getCell(`B${calcRow+1}`).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF2CC'}};
   const buffer=await wb.xlsx.writeBuffer();const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='パーテーション拾い出し結果_ドア対応.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('ドアを含むExcelを出力しました');
 }
 $('#exportBtn').addEventListener('click',async()=>{try{await exportExcel()}catch(e){toast(e.message)}});
-$('#copyBtn').addEventListener('click',async()=>{if(!lastResult)return;const r=lastResult;const doorText=r.doors.filter(d=>d.qty>0).map(d=>`${d.label}×${d.qty}${d.unit}`).join('、')||'ドアなし';const text=`${r.product} ${r.shape} / 割付対象幅 ${r.dimensions.allocation_width}mm / W1200×${r.counts.panel_1200}、W900×${r.counts.panel_900}、調整${r.dimensions.adjustment_width}mm×${r.counts.adjustment}、END×${r.counts.end}、2WAY×${r.counts.two_way}、3WAY×${r.counts.three_way} / ${doorText}`;await navigator.clipboard.writeText(text);toast('結果をコピーしました')});
+$('#copyBtn').addEventListener('click',async()=>{if(!lastResult)return;const r=lastResult;const doorText=r.doors.flatMap(d=>[['L',d.l_qty],['R',d.r_qty]].filter(x=>x[1]>0).map(([h,q])=>`${d.label}${h}×${q}${d.unit}`)).join('、')||'ドアなし';const text=`${r.product} ${r.shape} / 割付対象幅 ${r.dimensions.allocation_width}mm / W1200×${r.counts.panel_1200}、W900×${r.counts.panel_900}、調整${r.dimensions.adjustment_width}mm×${r.counts.adjustment}、END×${r.counts.end}、2WAY×${r.counts.two_way}、3WAY×${r.counts.three_way} / ${doorText}`;await navigator.clipboard.writeText(text);toast('結果をコピーしました')});
 
 updateDoorSummary();
 window.WALLFIT={calculate,SHAPES,DOOR_MASTER};
