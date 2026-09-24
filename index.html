@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles-20260924c.css" />
+  <link rel="stylesheet" href="./styles-20260924d.css" />
 </head>
 <body>
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
@@ -86,13 +86,14 @@
             <div class="door-row"><b>片開きドア</b><div class="hand-qty" aria-label="片開きドアの勝手別数量"><label><em>L</em><input id="singleDoorLQty" type="number" min="0" step="1" value="0"><small>枚</small></label><label><em>R</em><input id="singleDoorRQty" type="number" min="0" step="1" value="0"><small>枚</small></label></div><label><input id="singleDoorWidth" type="number" min="1" value="900"><small>mm</small></label><label><input id="singleDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
             <div class="door-row"><b>親子ドア</b><div class="hand-qty" aria-label="親子ドアの勝手別数量"><label><em>L</em><input id="parentChildDoorLQty" type="number" min="0" step="1" value="0"><small>組</small></label><label><em>R</em><input id="parentChildDoorRQty" type="number" min="0" step="1" value="0"><small>組</small></label></div><label><input id="parentChildDoorWidth" type="number" min="1" value="1200"><small>mm</small></label><label><input id="parentChildDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
             <div class="door-row"><b>両開きドア</b><div class="hand-qty" aria-label="両開きドアの勝手別数量"><label><em>L</em><input id="doubleDoorLQty" type="number" min="0" step="1" value="0"><small>組</small></label><label><em>R</em><input id="doubleDoorRQty" type="number" min="0" step="1" value="0"><small>組</small></label></div><label><input id="doubleDoorWidth" type="number" min="1" value="1800"><small>mm</small></label><label><input id="doubleDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
+            <div class="door-row"><b>引き戸</b><div class="hand-qty" aria-label="引き戸の勝手別数量"><label><em>L</em><input id="slidingDoorLQty" type="number" min="0" step="1" value="0"><small>枚</small></label><label><em>R</em><input id="slidingDoorRQty" type="number" min="0" step="1" value="0"><small>枚</small></label></div><label><input id="slidingDoorWidth" type="number" min="1" value="900"><small>mm</small></label><label><input id="slidingDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
           </div>
           <div class="door-summary"><span>ドア開口幅合計</span><strong id="doorOpeningTotal">0</strong><small>mm</small><i id="doorDeductionStatus">スパン内で置換</i></div>
           <section id="spanPlacementPanel" class="span-placement-panel">
             <div class="span-placement-head"><div><b>ドア配置スパン</b><small>左から何スパン目に入れるかを各扉ごとに指定</small></div><span id="baseSpanCount">基準割付 — スパン</span></div>
             <div id="spanPlacementList" class="span-placement-list"><p>ドア数量を入力すると配置欄が表示されます。</p></div>
           </section>
-          <p class="door-note">開口幅・開口高はExcel「仕様・接続・ドア入力」の初期値です。勝手は平面図で一般的なL／R表記です。ドア詳細部材は正式部材表が未登録のため、一式の仮マスタとして表示します。</p>
+          <p class="door-note">開口幅・開口高はExcel「仕様・接続・ドア入力」の初期値です。勝手は平面図で一般的なL／R表記です。引き戸は正面から見た開き方向（L＝左引き、R＝右引き）です。ドア詳細部材は正式部材表が未登録のため、一式の仮マスタとして表示します。</p>
         </section>
 
         <details class="advanced"><summary>詳細条件 <span>END・パネル設定</span></summary><div class="advanced-grid">
@@ -115,6 +116,6 @@
   <div id="toast" class="toast" role="status"></div>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-  <script src="./app-20260924c.js"></script>
+  <script src="./app-20260924d.js"></script>
 </body>
 </html>
