@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles-20260924.css" />
+  <link rel="stylesheet" href="./styles-20260924b.css" />
 </head>
 <body>
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
@@ -67,7 +67,14 @@
 
         <section class="door-input" aria-labelledby="doorTitle">
           <div class="door-head"><div><span class="kicker">DOOR VARIATION</span><h3 id="doorTitle">ドア選択</h3></div><span class="provisional-badge">仮マスタ・要確認</span></div>
-          <div class="door-deduction-row">
+          <div class="door-deduction-row placement-mode-row">
+            <span>ドア配置方法</span>
+            <div class="compact-segmented placement-segmented">
+              <input checked id="placementSpan" name="doorPlacementMode" type="radio" value="span"><label for="placementSpan">スパン指定</label>
+              <input id="placementBulk" name="doorPlacementMode" type="radio" value="bulk"><label for="placementBulk">一括控除</label>
+            </div>
+          </div>
+          <div id="bulkDeductionRow" class="door-deduction-row hidden">
             <span>ドア開口を総幅から控除</span>
             <div class="compact-segmented">
               <input checked id="doorNo" name="doorDeduct" type="radio" value="いいえ"><label for="doorNo">いいえ</label>
@@ -80,7 +87,11 @@
             <div class="door-row"><b>親子ドア</b><div class="hand-qty" aria-label="親子ドアの勝手別数量"><label><em>L</em><input id="parentChildDoorLQty" type="number" min="0" step="1" value="0"><small>組</small></label><label><em>R</em><input id="parentChildDoorRQty" type="number" min="0" step="1" value="0"><small>組</small></label></div><label><input id="parentChildDoorWidth" type="number" min="1" value="1200"><small>mm</small></label><label><input id="parentChildDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
             <div class="door-row"><b>両開きドア</b><div class="hand-qty" aria-label="両開きドアの勝手別数量"><label><em>L</em><input id="doubleDoorLQty" type="number" min="0" step="1" value="0"><small>組</small></label><label><em>R</em><input id="doubleDoorRQty" type="number" min="0" step="1" value="0"><small>組</small></label></div><label><input id="doubleDoorWidth" type="number" min="1" value="1800"><small>mm</small></label><label><input id="doubleDoorHeight" type="number" min="1" value="2100"><small>mm</small></label></div>
           </div>
-          <div class="door-summary"><span>ドア開口幅合計</span><strong id="doorOpeningTotal">0</strong><small>mm</small><i id="doorDeductionStatus">割付から控除しない</i></div>
+          <div class="door-summary"><span>ドア開口幅合計</span><strong id="doorOpeningTotal">0</strong><small>mm</small><i id="doorDeductionStatus">スパン内で置換</i></div>
+          <section id="spanPlacementPanel" class="span-placement-panel">
+            <div class="span-placement-head"><div><b>ドア配置スパン</b><small>左から何スパン目に入れるかを各扉ごとに指定</small></div><span id="baseSpanCount">基準割付 — スパン</span></div>
+            <div id="spanPlacementList" class="span-placement-list"><p>ドア数量を入力すると配置欄が表示されます。</p></div>
+          </section>
           <p class="door-note">開口幅・開口高はExcel「仕様・接続・ドア入力」の初期値です。勝手は平面図で一般的なL／R表記です。ドア詳細部材は正式部材表が未登録のため、一式の仮マスタとして表示します。</p>
         </section>
 
@@ -104,6 +115,6 @@
   <div id="toast" class="toast" role="status"></div>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-  <script src="./app-20260924.js"></script>
+  <script src="./app-20260924b.js"></script>
 </body>
 </html>
